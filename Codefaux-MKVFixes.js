@@ -7,7 +7,7 @@ const details = () => ({
     Type: 'Any',
     Operation:'Transcode',
     Description: 'Change container to MKV and fix video/data/subtitle track related issues ie webvtt, dvd_nav_packet, embeds, etm',
-    Version: '0.2.8',
+    Version: '0.2.8a',
     Tags:'pre-processing,ffmpeg,transcode,configurable',
     Inputs: [
       {
@@ -265,7 +265,7 @@ const plugin = (file, inputs, librarySettings) => {
   response.infoLog += 'Transcode check... \n ';
 
   if (transcode == 1) {
-    response.preset = prependcli + response.preset + `, -map 0:v? -map 0:a? -map 0:s? -map 0:d? -map 0:t? -map_metadata 0 `; // Implicitly map streams
+    response.preset = prependcli + ` , -map 0:v? -map 0:a? -map 0:s? -map 0:d? -map 0:t? -map_metadata 0 `; // Implicitly map streams
     response.preset += ` ${dropcli} `; // Drop streams we don't like / don't support
     response.preset += ` -scodec copy -dcodec copy -acodec copy -vcodec copy `; // codec copy as default
     response.preset += ` -a53cc 0 ${subcli} `; // Subtitle fixes
