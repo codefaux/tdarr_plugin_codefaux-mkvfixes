@@ -24,6 +24,19 @@ const details = () => ({
         },
       },
       {
+        name: 'mp4s',
+        tooltip: 'mp4s: Drop mp4s or preserve \\n - Drop (Recommended) results in loss of data contained within mp4s tracks, but their data is unsupported both by mkv and most players. \\n -- Read more online before switching to Drop, but it is the only option for mkv. \\n - Preserve keeps the data stream, which WILL error on mkv. Useful for selectively keeping problematic files in original formats.)',
+        type: 'string',
+        defaultValue: 'preserve',
+        inputUI: {
+          type: 'dropdown',
+          options: [
+            'preserve',
+            'drop',
+          ],
+        },
+      },
+      {
         name: 'webvtt',
         tooltip: 'webvtt: Decode as SRT or Drop \\n -- tdarr (all versions, last checked 2.27.02) packaged ffmpeg errors handling webvtt \\n ' + 
                  ' - Force (!NOT RECOMMENDED!) forces ffmpeg to detect and handle webvtt stream as webvtt on decode, resulting output will bear a webvtt track. \\n ' +
@@ -152,6 +165,20 @@ const plugin = (file, inputs) => {
               break;
           }
           dataid++;
+        }
+        else if ( file.ffProbeData.streams[i].codec_tag_string?.toLowerCase() ?? "" == "mp4s" ) {
+          response.infoLog += '  - data stream #' + dataid + ': mp4s tag: configured ' + inputs.mp4s + ' \n ';
+          switch ( inputs.mp4s ) {
+            default:
+            case 'drop':
+              transcode = 1;
+              dropcli += ' -map -d:' + dataid + ' ';
+              break;
+            case 'preserve':
+              // Nothing to do.
+              break;
+
+            }
         }
         break; 
       case 'subtitle':
