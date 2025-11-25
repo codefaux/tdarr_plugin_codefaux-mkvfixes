@@ -143,16 +143,24 @@ const plugin = (file, inputs) => {
 
 // Scan streams. -explicitly correct webvtt subtitle codec -convert mov_text to srt  -drop eia_608  -drop image attachments
   for (var i = 0; i < file.ffProbeData.streams.length; i++) {
-    response.infoLog += ` Stream ${i} type ${file.ffProbeData.streams[i].codec_type.toLowerCase()}  \n `;
+    let miTrack = null;
+
+    if (Array.isArray(file.mediaInfo?.track)) {
+      miTrack = file.mediaInfo.track.find(t =>
+        typeof t.StreamOrder !== "undefined" &&
+        Number(t.StreamOrder) === i
+      );
+    }
+
+    response.infoLog += ` Stream ${i} type ${file.ffProbeData.streams[i].codec_type?.toLowerCase() ?? ""}  \n `;
     response.infoLog += ` - codec_name ${file.ffProbeData.streams[i].codec_name} \n `;
-    if ( file.ffProbeData.streams.length + 1 == file.mediaInfo.track.length )
-    { response.infoLog += ` - CodecID ${file.mediaInfo.track[i+1].CodecID} \n `; }
-    else
-    { response.infoLog += ` - CodecID matching unavailable, sometimes ffprobedata and mediainfo count streams differently and this is not handled presently. \n `; }
-  
-    switch ( file.ffProbeData.streams[i].codec_type.toLowerCase() ) {
+    response.infoLog += ` - ffmpeg CodecID ${file.mediaInfo.track[i+1].CodecID} \n `;
+    response.infoLog += ` - MediaInfo CodecID (Title) ${miTrack?.CodecID} (${miTrack?.Title}) \n `;
+    response.infoLog += `   ---   \n `;
+
+    switch ( file.ffProbeData.streams[i].codec_type?.toLowerCase() ?? "" ) {
       case 'data':
-        if ( file.ffProbeData.streams[i].codec_name.toLowerCase() == "dvd_nav_packet" ) {
+        if ( file.ffProbeData.streams[i].codec_name?.toLowerCase() ?? "" == "dvd_nav_packet" ) {
           response.infoLog += '  - data stream #' + dataid + ': dvd_nav_packet: configured ' + inputs.dvd_nav_packet + ' \n ';
           switch ( inputs.dvd_nav_packet ) {
             default:
@@ -182,29 +190,27 @@ const plugin = (file, inputs) => {
         }
         break; 
       case 'subtitle':
-        if (( typeof file.ffProbeData.streams[i].codec_name == 'undefined' ) & ( file.container.toLowerCase() == "mkv" )) {
+        if ( miTrack?.CodecID.toLowerCase()=="s_text/webvtt") {
           response.infoLog += ' - quirk: ffmpeg fails webvtt detection \n ';
-          if ( file.mediaInfo.track[i+1].CodecID=="S_TEXT/WEBVTT") {
-            response.infoLog += '  - subtitle stream #' + subid + ': webvtt: configured ' + inputs.webvtt + ' \n ';
-            switch ( inputs.webvtt ) {
-              default:
-              case 'convert':
-                transcode = 1;
-                prependcli += ' -c:s:' + subid + ' srt ';
-                break;
-              case 'drop':
-                transcode = 1;
-                dropcli += ' -map -s:' + subid + ' ';
-                break;
-              case 'force': // -- should be correct action, FAIL, chop/skip/small file
-                response.infoLog += '- forcing problematic subtitle codec -- OUTPUT WILL BE BROKEN \n ';
-                transcode = 1;
-                prependcli += ' -c:s:' + subid + ' webvtt ';
-                break;
-            }
+          response.infoLog += '  - subtitle stream #' + subid + ': webvtt: configured ' + inputs.webvtt + ' \n ';
+          switch ( inputs.webvtt ) {
+            default:
+            case 'convert':
+              transcode = 1;
+              prependcli += ' -c:s:' + subid + ' srt ';
+              break;
+            case 'drop':
+              transcode = 1;
+              dropcli += ' -map -s:' + subid + ' ';
+              break;
+            case 'force': // -- should be correct action, FAIL, chop/skip/small file
+              response.infoLog += '- forcing problematic subtitle codec -- OUTPUT WILL BE BROKEN \n ';
+              transcode = 1;
+              prependcli += ' -c:s:' + subid + ' webvtt ';
+              break;
           }
         } else {
-          switch ( file.ffProbeData.streams[i].codec_name.toLowerCase() ) {
+          switch ( file.ffProbeData.streams[i].codec_name?.toLowerCase() ?? "" ) {
             case 'mov_text':
               response.infoLog += '  - subtitle stream #' + subid + ': mov_text: configured ' + inputs.mov_text + ' \n ';
               switch ( inputs.mov_text )
@@ -241,7 +247,7 @@ const plugin = (file, inputs) => {
         subid++;
         break;
       case 'video':
-        switch ( file.ffProbeData.streams[i].codec_name.toLowerCase() ) {
+        switch ( file.ffProbeData.streams[i].codec_name?.toLowerCase() ?? "" ) {
           case 'png':
           case 'jpg':
             response.infoLog += '  - video stream #' + vid + ': good_image_tracks: configured ' + inputs.good_image_tracks + ' \n ';
