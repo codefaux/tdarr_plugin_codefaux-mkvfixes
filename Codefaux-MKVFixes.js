@@ -126,7 +126,7 @@ const plugin = (file, inputs) => {
   const lib = require('../methods/lib')();
   inputs = lib.loadDefaultValues(inputs, details);
 
-  response.infoLog += 'Scanning.... \n ';
+  response.infoLog += ' == v' + details().Version + '\n  Scanning.... \n ';
 
 // Scan streams. -explicitly correct webvtt subtitle codec -convert mov_text to srt  -drop eia_608  -drop image attachments
   for (var i = 0; i < file.ffProbeData.streams.length; i++) {
@@ -255,7 +255,7 @@ const plugin = (file, inputs) => {
         // Not processing audio presently
         break;
       default:
-        response.infoLog += `-- Unsupported track format ${file.ffProbeData.streams[i].codec_type.toLowerCase()}, please report.`;
+        response.infoLog += `-- Unsupported track format ${file.ffProbeData.streams[i].codec_type?.toLowerCase() ?? ""}, please report. \n`;
         break;
     }
   }
@@ -273,9 +273,9 @@ const plugin = (file, inputs) => {
     response.processFile = true;
     response.FFmpegMode = true;
 
-    response.infoLog += '- File will be transcoded. \n ';
+    response.infoLog += '- Fixes required. File will be processed here. \n ';
   } else {
-    response.infoLog += '- File will not be transcoded. \n ';
+    response.infoLog += '- No fixes required. File will not be processed here. \n ';
   }
 
   return response;
