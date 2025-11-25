@@ -7,7 +7,7 @@ const details = () => ({
     Type: 'Any',
     Operation:'Transcode',
     Description: 'Change container to MKV and fix video/data/subtitle track related issues ie webvtt, dvd_nav_packet, embeds, etm',
-    Version: '0.2.8a',
+    Version: '0.2.13c',
     Tags:'pre-processing,ffmpeg,transcode,configurable',
     Inputs: [
       {
