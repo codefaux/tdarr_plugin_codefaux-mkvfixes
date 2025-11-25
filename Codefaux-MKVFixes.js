@@ -104,7 +104,7 @@ const details = () => ({
 });
 
 // function plugin (file, librarypreferences, inputs) {
-const plugin = (file, inputs, librarySettings) => {
+const plugin = (file, inputs) => {
   var transcode = 0;
   var dataid = 0;
   var subid = 0;
