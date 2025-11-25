@@ -281,6 +281,9 @@ const plugin = (file, inputs) => {
       case 'audio':
         // Not processing audio presently
         break;
+      case 'attachment':
+        // Not processing attachments presently
+        break;
       default:
         response.infoLog += `-- Unsupported track format ${file.ffProbeData.streams[i].codec_type?.toLowerCase() ?? ""}, please report. \n`;
         break;
