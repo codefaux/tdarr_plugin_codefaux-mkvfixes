@@ -12,7 +12,7 @@ const details = () => ({
     Inputs: [
       {
         name: 'mov_text',
-        tooltip: 'mov_text: Convert np4 subtitles to SRT or Drop \\n - Convert (Recommended) provides functionally identical output. \\n - Drop removes the subtitle stream. \\n -- I will not add a burn-in option, this is not a video transcode plugin.)',
+        tooltip: 'mov_text: Convert mp4 subtitles to SRT or Drop \\n - Convert (Recommended) provides functionally identical output. \\n - Drop removes the subtitle stream. \\n -- I will not add a burn-in option, this is not a video transcode plugin.)',
         type: 'string',
         defaultValue: 'convert',
         inputUI: {
