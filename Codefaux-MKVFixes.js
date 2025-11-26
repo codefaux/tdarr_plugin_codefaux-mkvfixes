@@ -7,7 +7,7 @@ const details = () => ({
     Type: 'Any',
     Operation:'Transcode',
     Description: 'Change container to MKV and fix video/data/subtitle track related issues ie webvtt, dvd_nav_packet, embeds, etm',
-    Version: '0.2.13c',
+    Version: '0.2.13f',
     Tags:'pre-processing,ffmpeg,transcode,configurable',
     Inputs: [
       {
@@ -152,10 +152,10 @@ const plugin = (file, inputs) => {
       );
     }
 
-    response.infoLog += ` Stream ${i} type ${file.ffProbeData.streams[i].codec_type?.toLowerCase() ?? ""}  \n `;
-    response.infoLog += ` - codec_name ${file.ffProbeData.streams[i].codec_name} \n `;
-    response.infoLog += ` - ffmpeg CodecID ${file.mediaInfo.track[i+1].CodecID} \n `;
-    response.infoLog += ` - MediaInfo CodecID (Title) ${miTrack?.CodecID} (${miTrack?.Title}) \n `;
+    response.infoLog += ` Stream ${i} type ${file.ffProbeData.streams[i].codec_type?.toLowerCase() ?? "-missing-"}  \n `;
+    response.infoLog += ` - codec_name ${file.ffProbeData.streams[i]?.codec_name ?? "-missing-"} \n `;
+    response.infoLog += ` - ffmpeg CodecID ${file.ffProbeData.streams[i]?.CodecID ?? "-missing-"} \n `;
+    response.infoLog += ` - MediaInfo CodecID (Title) ${miTrack?.CodecID ?? "-missing-"} (${miTrack?.Title ?? "-missing-"}) \n `;
     response.infoLog += `   ---   \n `;
 
     switch ( file.ffProbeData.streams[i].codec_type?.toLowerCase() ?? "" ) {
